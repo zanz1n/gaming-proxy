@@ -106,7 +106,6 @@ func (s *state) deleteTagged() error {
 	indexes := make([]int, 0, 2)
 	for i, v := range s.records {
 		if v.comment == TAG_NAME {
-			fmt.Println(i)
 			indexes = append(indexes, i)
 		}
 	}
