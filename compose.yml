@@ -1,0 +1,16 @@
+services:
+  proxy:
+    # build: .
+    image: ghcr.io/zanz1n/gaming-proxy:latest
+    restart: unless-stopped
+    network_mode: host
+    # env_file: .env
+    environment:
+      PROXIED_HOST: 127.0.0.1
+      PROXIED_PORT: 25565
+      CLOUDFLARE_TOKEN: ""
+      CLOUDFLARE_ZONE_ID: ""
+      CLOUDFLARE_SUB_DOMAIN: play
+      CLOUDFLARE_SERVICE: minecraft
+      CLOUDFLARE_OVERWRITE: true
+      NGROK_TOKEN: ""
