@@ -1,0 +1,49 @@
+ame: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+jobs:
+  build-and-release:
+    name: Build an release
+    runs-on: ubuntu-latest
+    env:
+      TARGETS: linux-x86 linux-x86_64 linux-aarch64 linux-riscv64 darwin-x86_64 darwin-aarch64 windows-x86_64 windows-aarch64
+
+    steps:
+      - name: Code checkout
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ matrix.go }}
+          # cache: true
+          # cache-dependency-path: "**/go.sum"
+
+      - name: Checkout LFS objects
+        run: git lfs checkout
+
+      - name: Build all targets
+        run: make all
+
+      - name: Create release
+        id: create_release
+        uses: softprops/action-gh-release@v2
+        with:
+          draft: true
+          prerelease: ${{ contains(github.ref, 'rc') || contains(github.ref, 'beta') || contains(github.ref, 'alpha') }}
+          files: |
+            checksums.txt
+            LICENSE
+            bin/proxy-darwin-aarch64
+            bin/proxy-darwin-x86_64
+            bin/proxy-linux-aarch64
+            bin/proxy-linux-riscv64
+            bin/proxy-linux-x86
+            bin/proxy-linux-x86_64
+            bin/proxy-windows-aarch64.exe
+            bin/proxy-windows-x86_64.exe
