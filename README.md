@@ -18,9 +18,11 @@ CLOUDFLARE_TOKEN="" # API token
 # Zone = the root domain registred in cloudflare
 CLOUDFLARE_ZONE_ID=""
 
-# The game protocol followed by the subdomain
 # In this example you can access the minecraft server in `play.domain.com`
-CLOUDFLARE_SUB_DOMAIN="_minecraft_tcp.play"
+CLOUDFLARE_SUB_DOMAIN="play"
+
+# The game protocol
+CLOUDFLARE_SERVICE="minecraft"
 
 # If set to true, an existent DNS record may be replaced
 CLOUDFLARE_OVERWRITE=true
@@ -47,6 +49,6 @@ curl -L -o ./gaming-proxy https://github.com/zanz1n/gaming-proxy/releases/latest
 ./gaming-proxy
 ```
 
-### Running MacOS or Windows
+### MacOS or Windows
 
 Download the latest executable [here](https://github.com/zanz1n/gaming-proxy/releases/latest).
