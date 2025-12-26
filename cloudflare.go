@@ -32,7 +32,7 @@ func RunCloudflare(ctx context.Context, host string, port uint16) error {
 		Zone:    zone,
 		cfg:     &cfg.Cloudflare,
 		c:       c,
-		records: nil,
+		records: make([]state_record, 0),
 	}
 
 	if err = s.loadRecords(); err != nil {
@@ -72,9 +72,9 @@ type state struct {
 }
 
 func (s *state) loadRecords() error {
-	res := s.c.DNS.Records.ScanListAutoPaging(s.Context,
-		dns.RecordScanListParams{
-			ZoneID: cloudflare.F(s.cfg.ZoneID),
+	res := s.c.DNS.Records.ListAutoPaging(s.Context,
+		dns.RecordListParams{
+			ZoneID: cloudflare.F(s.Zone.ID),
 		},
 	)
 
@@ -83,6 +83,7 @@ func (s *state) loadRecords() error {
 			return err
 		}
 		page := res.Current()
+
 		s.records = append(s.records, state_record{
 			id:      page.ID,
 			name:    page.Name,
@@ -105,6 +106,7 @@ func (s *state) deleteTagged() error {
 	indexes := make([]int, 0, 2)
 	for i, v := range s.records {
 		if v.comment == TAG_NAME {
+			fmt.Println(i)
 			indexes = append(indexes, i)
 		}
 	}
@@ -113,10 +115,11 @@ func (s *state) deleteTagged() error {
 		return nil
 	}
 	defer func() {
+		s.records = s.records[:len(s.records)-len(indexes)]
 		s.records = slices.Clip(s.records)
 	}()
 
-	for _, i := range indexes {
+	for j, i := range indexes {
 		_, err := s.c.DNS.Records.Delete(s.Context,
 			s.records[i].id,
 			dns.RecordDeleteParams{ZoneID: cloudflare.F(s.Zone.ID)},
@@ -125,8 +128,7 @@ func (s *state) deleteTagged() error {
 			return err
 		}
 
-		s.records[i] = s.records[len(s.records)-1]
-		s.records = s.records[:len(s.records)-1]
+		s.records[i] = s.records[len(s.records)-(j+1)]
 	}
 
 	return nil

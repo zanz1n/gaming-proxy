@@ -60,7 +60,7 @@ func main() {
 		"took", time.Since(start).Round(time.Millisecond),
 	)
 
-	slog.Info("Successfully setup!",
+	slog.Info("Running",
 		"took",
 		time.Since(s1).Round(time.Millisecond),
 	)
